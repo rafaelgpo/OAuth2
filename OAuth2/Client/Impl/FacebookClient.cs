@@ -81,19 +81,22 @@ namespace OAuth2.Client.Impl
         protected override UserInfo ParseUserInfo(string content)
         {
             var response = JObject.Parse(content);
-            const string avatarUriTemplate = "{0}?type={1}";
-            var avatarUri = response["picture"]["data"]["url"].Value<string>();
+            const string avatarUriTemplate = "{0}/{1}/picture?type={2}";
+            var avatarUri = UserInfoServiceEndpoint.BaseUri;
+
+            string idFacebook = response["id"].Value<string>();
+
             return new UserInfo
             {
-                Id = response["id"].Value<string>(),
+                Id = idFacebook,
                 FirstName = response["first_name"].Value<string>(),
                 LastName = response["last_name"].Value<string>(),
                 Email = response["email"].SafeGet(x => x.Value<string>()),
                 AvatarUri =
                 {
-                    Small = !string.IsNullOrWhiteSpace(avatarUri) ? string.Format(avatarUriTemplate, avatarUri, "small") : string.Empty,
-                    Normal = !string.IsNullOrWhiteSpace(avatarUri) ? string.Format(avatarUriTemplate, avatarUri, "normal") : string.Empty,
-                    Large = !string.IsNullOrWhiteSpace(avatarUri) ? string.Format(avatarUriTemplate, avatarUri, "large") : string.Empty
+                    Small = !string.IsNullOrWhiteSpace(avatarUri) ? string.Format(avatarUriTemplate, avatarUri, idFacebook, "small") : string.Empty,
+                    Normal = !string.IsNullOrWhiteSpace(avatarUri) ? string.Format(avatarUriTemplate, avatarUri, idFacebook, "normal") : string.Empty,
+                    Large = !string.IsNullOrWhiteSpace(avatarUri) ? string.Format(avatarUriTemplate, avatarUri, idFacebook, "large") : string.Empty
                 }
             };
         }
